@@ -1,5 +1,0 @@
-import {redirect} from 'next/navigation'
-import {createClient} from '@/lib/supabase/server'
-const brl=(n:number)=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})
-export default async function PlanosAdmin(){const s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect('/login');const {data:p}=await s.from('profiles').select('role').eq('id',user.id).single();if(p?.role!=='MASTER_ADMIN')redirect('/dashboard');const {data:plansData}=await s.from('plans').select('*').order('created_at');const plans=plansData??[];return <div className="container"><div className="page-title"><div><h1>Planos</h1><p className="muted">Planos e preços da plataforma.</p></div></div><div className="grid grid-3">{plans.map((pl:any)=><div className="card stat" key={pl.id}><div className="stat-label">{pl.is_active?'Ativo':'Inativo'}</div><h2 style={{margin:'8px 0'}}>{pl.name}</h2><div className="stat-value">{brl(Number(pl.price))}<span style={{fontSize:13}}>/ {pl.period_days} dias</span></div><p className="muted">{pl.description}</p></div>)}</div></div>}
-
