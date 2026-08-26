@@ -77,3 +77,7 @@ O fluxo de confirmação usa `/auth/confirm` e o fluxo de recuperação usa `/re
 ## Próxima etapa
 
 Somente depois de você aprovar visual e funcionalmente esta versão, integrar Mercado Pago, webhooks, renovação automática e Resend.
+
+## V8.1 — entrega profissional
+
+Esta versão corrige o cadastro de Pessoas, melhora o layout desktop/mobile, adiciona busca/edição e prepara a gestão segura de assinaturas pelo Administrador Master. Consulte `RELEASE_NOTES.md` para o checklist de publicação.
