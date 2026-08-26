@@ -14,7 +14,8 @@ function visualStatus(status:string,due:string,principal:number,initial:number){
 }
 export default async function Dashboard(){
  const supabase=await createClient()
- const {data:loans=[]}=await supabase.from('loans').select('id,friendly_id,principal_initial,principal_current,status,due_date,rate_value,people(name)').order('due_date',{ascending:true}).limit(100)
+ const {data:loansData}=await supabase.from('loans').select('id,friendly_id,principal_initial,principal_current,status,due_date,rate_value,people(name)').order('due_date',{ascending:true}).limit(100)
+ const loans=loansData??[]
  const total=loans.reduce((s,l)=>s+Number(l.principal_current||0),0)
  const active=loans.filter(l=>Number(l.principal_current)>0).length
  const paid=loans.filter(l=>Number(l.principal_current)<=0).length
@@ -37,3 +38,4 @@ export default async function Dashboard(){
   </div>
  </div>
 }
+

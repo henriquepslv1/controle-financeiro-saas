@@ -14,11 +14,14 @@ export default async function Detalhes({params}:{params:Promise<{id:string}>}){
  const supabase=await createClient()
  const {data:loan}=await supabase.from('loans').select('*,people(name,phone)').eq('id',id).single()
  if(!loan)notFound()
- const [{data:payments=[]},{data:periods=[]},{data:adjustments=[]}]=await Promise.all([
+ const [{data:paymentsData},{data:periodsData},{data:adjustmentsData}]=await Promise.all([
   supabase.from('payments').select('*').eq('loan_id',id).order('payment_date',{ascending:false}),
   supabase.from('loan_periods').select('*').eq('loan_id',id).order('start_date',{ascending:false}),
   supabase.from('loan_adjustments').select('*').eq('loan_id',id).order('created_at',{ascending:false}),
  ])
+ const payments=paymentsData??[]
+ const periods=periodsData??[]
+ const adjustments=adjustmentsData??[]
  const received=payments.reduce((s:any,p:any)=>s+Number(p.total_amount),0)
  const charges=payments.reduce((s:any,p:any)=>s+Number(p.charge_amount),0)
  const principalPaid=payments.reduce((s:any,p:any)=>s+Number(p.principal_amount),0)
@@ -32,3 +35,4 @@ export default async function Detalhes({params}:{params:Promise<{id:string}>}){
   <div className="grid grid-2" style={{marginTop:20}}><div className="card" style={{padding:20}}><h2 style={{marginTop:0}}>Períodos</h2>{periods.length===0?<div className="empty">Nenhum período registrado.</div>:periods.map((p:any)=><div key={p.id} className="history-row"><div><strong>{new Date(p.start_date+'T12:00:00').toLocaleDateString('pt-BR')} → {new Date(p.end_date+'T12:00:00').toLocaleDateString('pt-BR')}</strong><div className="muted small">Base {brl(Number(p.base_principal))} · Encargo {brl(Number(p.calculated_charge))}</div></div><span className={`badge ${p.status==='PAID'?'green':'amber'}`}>{p.status==='PAID'?'Pago':'Aberto'}</span></div>)}</div><div className="card" style={{padding:20}}><h2 style={{marginTop:0}}>Movimentações de principal</h2>{adjustments.length===0?<div className="empty">Nenhuma movimentação registrada.</div>:adjustments.map((a:any)=><div key={a.id} className="history-row"><div><strong>{a.type==='ADD_PRINCIPAL'?'Acréscimo':'Redução'} · {brl(Number(a.amount))}</strong><div className="muted small">{a.reason||'Sem motivo informado'}</div></div><span className="muted">{new Date(a.created_at).toLocaleDateString('pt-BR')}</span></div>)}</div></div>
  </div>
 }
+
